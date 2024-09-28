@@ -2,7 +2,7 @@ import pandas as pd
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 
-def calculate_vif(data: pd.DataFrame, threshold=5):
+def calculate_vif(data: pd.DataFrame, threshold=10) -> pd.DataFrame:
     """
     Calculate Variance Inflation Factor (VIF) for each variable in the data.
     :param data:  Pandas DataFrame
@@ -16,6 +16,7 @@ def calculate_vif(data: pd.DataFrame, threshold=5):
     ]
     vif = vif.sort_values(by="VIF", ascending=False)
     if vif["VIF"].max() > threshold:
+        print(f"Removing {vif['variables'].values[0]} with VIF {vif['VIF'].values[0]}")
         data = data.drop(vif["variables"].values[0], axis=1)
         return calculate_vif(data)
     return vif
