@@ -1,12 +1,18 @@
 # Credit Card Default Prediction
 
 ## Overview
-This project focuses on predicting whether a credit card client will default on their next payment, using the **Credit Card Default UCI dataset**. By applying various machine learning algorithms, we aim to build a model that can help banks and financial institutions make informed decisions on credit approvals, risk assessment, and managing portfolios.
+
+This project focuses on predicting whether a credit card client will default on their next payment, using the **Credit
+Card Default UCI dataset**. By applying various machine learning algorithms, we aim to build a model that can help banks
+and financial institutions make informed decisions on credit approvals, risk assessment, and managing portfolios.
 
 ## Dataset
-The dataset contains information on **30,000 credit card clients** from a Taiwanese bank, with features related to demographic and financial factors. The target variable indicates whether the client defaulted on their next payment.
+
+The dataset contains information on **30,000 credit card clients** from a Taiwanese bank, with features related to
+demographic and financial factors. The target variable indicates whether the client defaulted on their next payment.
 
 ### Features
+
 The dataset includes the following columns:
 
 1. **ID**: Unique identifier of each client.
@@ -20,18 +26,21 @@ The dataset includes the following columns:
 9. **PAY_AMT1 to PAY_AMT6**: Amounts paid in previous months.
 10. **Default Payment (target)**: Binary variable (1 = default, 0 = no default).
 
-The dataset can be downloaded from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients).
+The dataset can be downloaded from
+the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients).
 
 ## Project Goals
+
 The main goals of this project are:
+
 - Perform **exploratory data analysis (EDA)** to gain insights into the dataset.
 - Preprocess the data, handling missing values and scaling features.
 - Implement **machine learning models** to predict default rates, such as:
-  - Logistic Regression
-  - Decision Trees
-  - Random Forest
-  - Support Vector Machines (SVM)
-  - Neural Networks
+    - Logistic Regression
+    - Decision Trees
+    - Random Forest
+    - Support Vector Machines (SVM)
+    - Neural Networks
 - Evaluate the performance of these models using metrics like **accuracy, precision, recall, F1-score, and AUC**.
 - Provide an analysis of feature importance to understand which factors contribute most to defaults.
 
