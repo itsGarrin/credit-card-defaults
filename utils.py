@@ -1,4 +1,6 @@
+import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.metrics import roc_curve, roc_auc_score
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 
@@ -43,3 +45,33 @@ def calculate_vif(
             print(f"{var}: {vif_value}")
 
     return data
+
+
+def plot_roc_curve(y_true, y_pred):
+    """
+    Plot the Receiver Operating Characteristic (ROC) curve for a binary classification model.
+
+    This function uses the roc_curve function from scikit-learn to calculate the True Positive Rate (TPR)
+    and False Positive Rate (FPR) at different thresholds. It then plots the ROC curve and annotates the
+    area under the curve (AUC) in the plot.
+
+    Parameters:
+    y_true (array-like): The true binary labels for the data.
+    y_pred (array-like): The predicted probabilities for the positive class.
+
+    Returns:
+    None
+    """
+
+    fpr, tpr, _ = roc_curve(y_true, y_pred)
+    auc = roc_auc_score(y_true, y_pred)
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr, tpr, color="blue", label=f"ROC Curve (AUC = {auc:.4f})")
+    plt.plot([0, 1], [0, 1], color="red", linestyle="--", label="Random")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("Receiver Operating Characteristic (ROC) Curve")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
