@@ -112,7 +112,7 @@ def evaluate_models(
     Returns:
     -------
     pd.DataFrame
-        A DataFrame with accuracy, precision, recall, F1 score, and AUC for both base and hyperparameter-tuned models.
+        A DataFrame with accuracy, precision, recall, and F1 score for both base and hyperparameter-tuned models.
     """
 
     def compute_metrics(y_true, y_pred):
@@ -121,7 +121,6 @@ def evaluate_models(
             "Precision": precision_score(y_true, y_pred),
             "Recall": recall_score(y_true, y_pred),
             "F1 Score": f1_score(y_true, y_pred),
-            "AUC": roc_auc_score(y_true, y_pred),
         }
 
     metrics_base = [compute_metrics(y_test, y_pred) for y_pred in predictions_base]
@@ -147,10 +146,6 @@ def evaluate_models(
             "F1 Score": [metrics["F1 Score"] for metrics in metrics_base],
             "F1 Score (Hyperparameter Tuning)": [
                 metrics["F1 Score"] for metrics in metrics_hyper
-            ],
-            "AUC": [metrics["AUC"] for metrics in metrics_base],
-            "AUC (Hyperparameter Tuning)": [
-                metrics["AUC"] for metrics in metrics_hyper
             ],
         }
     )
