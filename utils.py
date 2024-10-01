@@ -6,7 +6,7 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 
 def calculate_vif(
-    data: pd.DataFrame, threshold: float = 10, removed_variables: list = None
+    data: pd.DataFrame, threshold: float = 5, removed_variables: list = None
 ) -> pd.DataFrame:
     """
     Calculate and remove variables with high Variance Inflation Factor (VIF) from a DataFrame.
@@ -97,22 +97,23 @@ def evaluate_models(
 ) -> pd.DataFrame:
     """
     Compare the performance of base models and models with hyperparameter tuning.
+    Returns a DataFrame with detailed metrics for each model.
 
     Parameters:
     ----------
-    models : list
+    models : list.
         List of model names.
-    predictions_base : list
+    predictions_base : list.
         List of predicted values from the base models.
-    predictions_hyper : list
+    predictions_hyper : list.
         List of predicted values from hyperparameter-tuned models.
-    y_test : array-like
+    y_test : array-like.
         Ground truth (correct) labels for the test set.
 
     Returns:
     -------
-    pd.DataFrame
-        A DataFrame with accuracy, precision, recall, and F1 score for both base and hyperparameter-tuned models.
+    pd.DataFrame.
+        A DataFrame with detailed metrics including accuracy, precision, recall, and F1 score for both base and hyperparameter-tuned models.
     """
 
     def compute_metrics(y_true, y_pred):
@@ -121,33 +122,67 @@ def evaluate_models(
             "Precision": precision_score(y_true, y_pred),
             "Recall": recall_score(y_true, y_pred),
             "F1 Score": f1_score(y_true, y_pred),
+            "Positive Precision": precision_score(y_true, y_pred, pos_label=1),
+            "Negative Precision": precision_score(y_true, y_pred, pos_label=0),
+            "Positive Recall": recall_score(y_true, y_pred, pos_label=1),
+            "Negative Recall": recall_score(y_true, y_pred, pos_label=0),
+            "Positive F1 Score": f1_score(y_true, y_pred, pos_label=1),
+            "Negative F1 Score": f1_score(y_true, y_pred, pos_label=0),
         }
 
-    metrics_base = [compute_metrics(y_test, y_pred) for y_pred in predictions_base]
-    metrics_hyper = [
-        compute_metrics(y_test, y_pred_hyper) for y_pred_hyper in predictions_hyper
-    ]
+    # Compute metrics for both types of models
+    all_metrics_base = {
+        model: compute_metrics(y_test, y_pred)
+        for model, y_pred in zip(models, predictions_base)
+    }
+    all_metrics_hyper = {
+        model: compute_metrics(y_test, y_pred)
+        for model, y_pred in zip(models, predictions_hyper)
+    }
 
-    results = pd.DataFrame(
-        {
-            "Model": models,
-            "Accuracy": [metrics["Accuracy"] for metrics in metrics_base],
-            "Accuracy (Hyperparameter Tuning)": [
-                metrics["Accuracy"] for metrics in metrics_hyper
-            ],
-            "Precision": [metrics["Precision"] for metrics in metrics_base],
-            "Precision (Hyperparameter Tuning)": [
-                metrics["Precision"] for metrics in metrics_hyper
-            ],
-            "Recall": [metrics["Recall"] for metrics in metrics_base],
-            "Recall (Hyperparameter Tuning)": [
-                metrics["Recall"] for metrics in metrics_hyper
-            ],
-            "F1 Score": [metrics["F1 Score"] for metrics in metrics_base],
-            "F1 Score (Hyperparameter Tuning)": [
-                metrics["F1 Score"] for metrics in metrics_hyper
-            ],
-        }
-    )
+    # Initialize the DataFrame structure
+    metrics = list(compute_metrics(y_test, predictions_base[0]).keys())
+    results_base = pd.DataFrame(index=metrics, columns=models)
+    results_hyper = pd.DataFrame(index=metrics, columns=models)
 
-    return results
+    # Fill the DataFrames with metrics
+    for model in models:
+        for metric in metrics:
+            results_base.loc[metric, model] = all_metrics_base[model][metric]
+            results_hyper.loc[metric, model] = all_metrics_hyper[model][metric]
+
+    # Combine the base and hyperparameter-tuning results by concatenating vertically
+    results_base["Type"] = "Base"
+    results_hyper["Type"] = "Hyperparameter Tuning"
+    results_combined = pd.concat([results_base, results_hyper])
+    results_combined.reset_index(inplace=True)
+    results_combined.rename(columns={"index": "Metric"}, inplace=True)
+    results_combined.set_index(["Metric", "Type"], inplace=True)
+
+    # Create a single summary column for both base and hyperparameter tuning
+    summary_list = []
+    for metric in metrics:
+        base_values = results_combined.xs("Base", level=1).loc[metric]
+        hyper_values = results_combined.xs("Hyperparameter Tuning", level=1).loc[metric]
+
+        max_base_value = base_values.max()
+        max_hyper_value = hyper_values.max()
+
+        if max_base_value >= max_hyper_value:
+            best_model = base_values.idxmax()
+            best_value = max_base_value
+        else:
+            best_model = hyper_values.idxmax()
+            best_value = max_hyper_value
+
+        summary_list.append(
+            {"Metric": metric, "Best Model": best_model, "Highest Value": best_value}
+        )
+
+    summary_df = pd.DataFrame(summary_list)
+    summary_df.set_index("Metric", inplace=True)
+
+    # Combine the results_combined DataFrame with the summary DataFrame
+    final_results = results_combined.join(summary_df)
+
+    return final_results
