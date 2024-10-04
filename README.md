@@ -39,7 +39,6 @@ The main goals of this project are:
     - Logistic Regression
     - Decision Trees
     - Random Forest
-    - Support Vector Machines (SVM)
     - Neural Networks
 - Evaluate the performance of these models using metrics like **accuracy, precision, recall, F1-score, and AUC**.
 - Provide an analysis of feature importance to understand which factors contribute most to defaults.
