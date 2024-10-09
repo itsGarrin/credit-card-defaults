@@ -20,7 +20,7 @@ def calculate_vif(
     data : pd.DataFrame
         The input DataFrame containing the variables to be evaluated.
     threshold : float, optional
-        The VIF threshold above which variables will be removed. Default is 10.
+        The VIF threshold above which variables will be removed. Default is 5.
     removed_variables : list, optional
         A list to collect the names and VIF values of removed variables during recursion. Default is None.
 
