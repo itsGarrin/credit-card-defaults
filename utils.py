@@ -186,3 +186,27 @@ def evaluate_models(
     final_results = results_combined.join(summary_df)
 
     return final_results
+
+
+def plot_loss(history):
+    """
+    Plot the training and validation loss for a Keras model.
+
+    Parameters:
+    ----------
+    history : keras.callbacks.History
+        The history object returned by the model.fit() function.
+
+    Returns:
+    -------
+    None
+    """
+    plt.figure(figsize=(8, 6))
+    plt.plot(history.history["loss"], label="Training Loss")
+    plt.plot(history.history["val_loss"], label="Validation Loss")
+    plt.title("Model Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.grid()
+    plt.show()
